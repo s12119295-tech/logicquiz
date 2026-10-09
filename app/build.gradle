@@ -1,0 +1,37 @@
+plugins { id 'com.android.application' }
+
+def ksFile = rootProject.file('keystore.properties')
+def ks = new Properties()
+if (ksFile.exists()) { ks.load(new FileInputStream(ksFile)) }
+
+android {
+    namespace 'com.novaforge.braintrap'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.novaforge.braintrap"   // باید با نام پکیج ثبت‌شده در پنل مایکت یکی باشد
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+    buildFeatures { aidl true }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    signingConfigs {
+        release {
+            if (ksFile.exists()) {
+                storeFile file(ks['storeFile']); storePassword ks['storePassword']
+                keyAlias ks['keyAlias']; keyPassword ks['keyPassword']
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (ksFile.exists()) { signingConfig signingConfigs.release }
+        }
+    }
+}
